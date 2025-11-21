@@ -11,6 +11,7 @@ const {
 const router = express.Router();
 
 router.get('/', productsController.getProducts);
+router.get('/categories', productsController.getCategories);
 router.post(
   '/',
   authMiddleware,

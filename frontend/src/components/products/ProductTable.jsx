@@ -71,7 +71,7 @@ function ProductTable({
                 />
               </th>
               <th>Status</th>
-              <th>Actions</th>
+              <th style={{ textAlign: 'center' }}>Actions</th>
             </tr>
           </thead>
           <tbody>

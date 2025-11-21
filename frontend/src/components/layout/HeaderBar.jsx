@@ -32,9 +32,9 @@ function HeaderBar({ hideActions = false }) {
       </div>
       {!hideActions && (
         <div className="header-actions">
-          {user && <span className="user-label">{user.email}</span>}
+          {user && <span className="user-label" style={{ fontSize: '25px' }}>{user.name.split('@')[0]}</span>}
           {user && (
-            <button type="button" className="link-button" onClick={handleLogout}>
+            <button type="button" className="link-button" style={{ fontSize: '15px' }} onClick={handleLogout}>
               Logout
             </button>
           )}

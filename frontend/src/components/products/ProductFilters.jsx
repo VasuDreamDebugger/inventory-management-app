@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useRef } from 'react';
 
 function ProductFilters({
   search,
@@ -7,7 +8,19 @@ function ProductFilters({
   onCategoryChange,
   categoryOptions,
   onAddClick,
+  onImport,
+  onExport,
 }) {
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onImport(file);
+      event.target.value = '';
+    }
+  };
+
   return (
     <section className="product-filters">
       <div className="filter-group">
@@ -37,9 +50,29 @@ function ProductFilters({
           </select>
         </label>
       </div>
-      <button type="button" className="primary-btn" onClick={onAddClick}>
-        Add Product
-      </button>
+      
+      <div className="filter-actions">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          hidden
+          onChange={handleFileChange}
+        />
+        <button
+          type="button"
+          className="import-btn"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          Import CSV
+        </button>
+        <button type="button" className="export-btn" onClick={onExport}>
+          Export CSV
+        </button>
+        <button type="button" className="primary-btn" onClick={onAddClick}>
+          Add Product
+        </button>
+      </div>
     </section>
   );
 }
@@ -51,6 +84,8 @@ ProductFilters.propTypes = {
   onCategoryChange: PropTypes.func.isRequired,
   categoryOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
   onAddClick: PropTypes.func.isRequired,
+  onImport: PropTypes.func.isRequired,
+  onExport: PropTypes.func.isRequired,
 };
 
 export default ProductFilters;

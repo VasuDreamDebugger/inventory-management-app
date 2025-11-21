@@ -89,6 +89,20 @@ async function getProducts(req, res, next) {
   }
 }
 
+async function getCategories(req, res, next) {
+  try {
+    const rows = await runQuery(
+      `SELECT DISTINCT category FROM products
+       WHERE category IS NOT NULL AND TRIM(category) != ''
+       ORDER BY category COLLATE NOCASE ASC`
+    );
+    const categories = rows.map((row) => row.category);
+    return res.json({ categories });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function createProduct(req, res, next) {
   try {
     const {
@@ -331,6 +345,7 @@ async function exportProducts(req, res, next) {
 
 module.exports = {
   getProducts,
+  getCategories,
   createProduct,
   updateProduct,
   deleteProduct,

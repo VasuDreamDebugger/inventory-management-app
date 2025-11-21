@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ProductFilters from './ProductFilters';
-import ImportExportBar from './ImportExportBar';
 import ProductTable from './ProductTable';
 import PaginationControls from './PaginationControls';
 import InventoryHistorySidebar from './InventoryHistorySidebar';
@@ -17,6 +16,7 @@ function ProductsPage() {
   const [sort, setSort] = useState('name');
   const [order, setOrder] = useState('asc');
   const [page, setPage] = useState(1);
+  const [categoryOptions, setCategoryOptions] = useState([]);
 
   const [notification, setNotification] = useState('');
   const [notificationType, setNotificationType] = useState('success');
@@ -57,6 +57,20 @@ function ProductsPage() {
     });
   }, [search, category, page, sort, order, setParams]);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await productsApi.getCategories();
+      setCategoryOptions(response.categories || []);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to load categories', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
   useEffect(() => {
     if (!isHistoryOpen || !historyProduct) {
       return;
@@ -78,7 +92,7 @@ function ProductsPage() {
     fetchHistory();
   }, [isHistoryOpen, historyProduct]);
 
-  const categoryOptions = useMemo(() => {
+  const fallbackCategories = useMemo(() => {
     const set = new Set();
     products.forEach((product) => {
       if (product.category) {
@@ -87,6 +101,9 @@ function ProductsPage() {
     });
     return Array.from(set);
   }, [products]);
+
+  const combinedCategoryOptions =
+    categoryOptions.length > 0 ? categoryOptions : fallbackCategories;
 
   const showNotification = (message, type = 'success') => {
     setNotification(message);
@@ -116,6 +133,7 @@ function ProductsPage() {
         `Import complete. Added ${result.added}, skipped ${result.skipped}.`
       );
       refresh();
+      fetchCategories();
     } catch (err) {
       showNotification(
         err.response?.data?.error || 'Failed to import CSV',
@@ -148,6 +166,7 @@ function ProductsPage() {
       await productsApi.updateProduct(id, values);
       showNotification('Product updated');
       refresh();
+      fetchCategories();
     } catch (err) {
       const message =
         err.response?.data?.error ||
@@ -165,6 +184,7 @@ function ProductsPage() {
       await productsApi.deleteProduct(id);
       showNotification('Product deleted');
       refresh();
+      fetchCategories();
     } catch (err) {
       showNotification(
         err.response?.data?.error || 'Failed to delete product',
@@ -185,6 +205,7 @@ function ProductsPage() {
       setIsFormOpen(false);
       setFormProduct(null);
       refresh();
+      fetchCategories();
     } catch (err) {
       const message =
         err.response?.data?.error ||
@@ -221,12 +242,12 @@ function ProductsPage() {
             setCategory(value === 'All' ? '' : value);
             setPage(1);
           }}
-          categoryOptions={categoryOptions}
+          categoryOptions={combinedCategoryOptions}
           onAddClick={handleAddProduct}
+          onImport={handleImport}
+          onExport={handleExport}
         />
-        <ImportExportBar onImport={handleImport} onExport={handleExport} />
       </div>
-
       {notification && (
         <div className={`inline-alert ${notificationType}`}>
           {notification}

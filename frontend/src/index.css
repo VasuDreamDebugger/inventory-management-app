@@ -34,3 +34,13 @@ a {
 button {
   font-family: inherit;
 }
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+input,
+select {
+  font-family: inherit;
+}

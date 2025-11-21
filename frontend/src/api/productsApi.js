@@ -6,6 +6,11 @@ const productsApi = {
     return response.data;
   },
 
+  async getCategories() {
+    const response = await axiosClient.get('/products/categories');
+    return response.data;
+  },
+
   async createProduct(data) {
     const response = await axiosClient.post('/products', data);
     return response.data;

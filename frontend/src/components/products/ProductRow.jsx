@@ -161,21 +161,21 @@ function ProductRow({ product, onEdit, onDelete, onViewHistory }) {
             <>
               <button
                 type="button"
-                className="secondary-btn"
+                className="action-btn action-btn-edit"
                 onClick={() => setIsEditing(true)}
               >
                 Edit
               </button>
               <button
                 type="button"
-                className="link-button light"
+                className="action-btn action-btn-delete"
                 onClick={() => onDelete(product.id)}
               >
                 Delete
               </button>
               <button
                 type="button"
-                className="link-button"
+                className="action-btn action-btn-history"
                 onClick={() => onViewHistory(product)}
               >
                 History
