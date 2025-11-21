@@ -1,28 +1,38 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import AppLayout from './components/layout/AppLayout';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import LoginPage from './components/auth/LoginPage';
 import ProductsPage from './components/products/ProductsPage';
+import AppLayout from './components/layout/AppLayout';
 
-function RequireAuth() {
+function RequireAuth({ children }) {
   const token = localStorage.getItem('token');
   if (!token) {
     return <Navigate to="/login" replace />;
   }
-  return <Outlet />;
+  return children;
 }
 
 function App() {
   return (
-    <Routes>
-      <Route element={<AppLayout />}>
+    <AppLayout>
+      <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route element={<RequireAuth />}>
-          <Route path="/" element={<ProductsPage />} />
-        </Route>
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route
+          path="/"
+          element={(
+            <RequireAuth>
+              <ProductsPage />
+            </RequireAuth>
+          )}
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AppLayout>
   );
 }
 
 export default App;
+
+RequireAuth.propTypes = {
+  children: PropTypes.node.isRequired,
+};
