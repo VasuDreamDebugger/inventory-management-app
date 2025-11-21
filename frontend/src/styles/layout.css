@@ -1,0 +1,64 @@
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f6f8fb;
+  color: #1e1e23;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: #1f4b99;
+  color: #fff;
+}
+
+.app-title {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.user-label {
+  opacity: 0.9;
+}
+
+.link-button {
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.link-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.app-content {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .header-bar {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .app-content {
+    padding: 1rem;
+  }
+}
+
