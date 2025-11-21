@@ -7,6 +7,7 @@ function useProducts(initialParams = {}) {
   const [params, setParams] = useState(initialParams);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -33,7 +34,9 @@ function useProducts(initialParams = {}) {
     return () => {
       isMounted = false;
     };
-  }, [params]);
+  }, [params, version]);
+
+  const refresh = () => setVersion((prev) => prev + 1);
 
   return {
     data,
@@ -42,6 +45,7 @@ function useProducts(initialParams = {}) {
     setParams,
     loading,
     error,
+    refresh,
   };
 }
 
