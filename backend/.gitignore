@@ -1,0 +1,46 @@
+# Node modules
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+logs/
+*.log
+
+# SQLite and DB files
+*.db
+*.sqlite
+inventory.db
+
+# Uploaded files
+uploads/
+/uploads/
+
+# Build output
+dist/
+build/
+
+# Coverage
+coverage/
+
+# OS files
+.DS_Store
+
+# IDE/editor directories
+.vscode/
+.idea/
+
+# Jest cache
+jest-cache/
+
+# Misc
+*.tgz
+*.log
+
+# Lock files (optional to ignore during development)
+# package-lock.json
+
