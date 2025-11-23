@@ -63,6 +63,11 @@ Important frontend files/folders:
   ```
   and update `src/api/axiosClient.js` to use `import.meta.env.VITE_API_BASE_URL`.
 
+**Note about installs and CI**
+
+- If `npm install` fails on CI (Render) with `ERESOLVE` due to peer dependency conflicts (for example React 19 vs dev deps expecting React 18), this repository includes a repo-level `.npmrc` configured with `legacy-peer-deps=true` so installs on CI will ignore strict peer dependency enforcement.
+- If you'd rather not rely on `.npmrc`, you can set the build command to run `npm ci --legacy-peer-deps` or set `npm config set legacy-peer-deps true` before installing.
+
 ## Setup & installation
 
 1. Change into the frontend folder:
