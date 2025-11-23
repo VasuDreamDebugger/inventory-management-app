@@ -41,6 +41,7 @@ function ProductTable({
         <table>
           <thead>
             <tr>
+              <th style={{ width: '80px' }}>Image</th>
               <th>
                 <SortableHeader
                   label="Name"
@@ -77,21 +78,21 @@ function ProductTable({
           <tbody>
             {loading && (
               <tr>
-                <td colSpan={7} className="table-status">
+                <td colSpan={8} className="table-status">
                   Loading products…
                 </td>
               </tr>
             )}
             {error && !loading && (
               <tr>
-                <td colSpan={7} className="table-status error">
+                <td colSpan={8} className="table-status error">
                   {error}
                 </td>
               </tr>
             )}
             {!loading && !error && products.length === 0 && (
               <tr>
-                <td colSpan={7} className="table-status">
+                <td colSpan={8} className="table-status">
                   No products found.
                 </td>
               </tr>

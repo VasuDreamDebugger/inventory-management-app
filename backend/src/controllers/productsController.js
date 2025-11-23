@@ -343,6 +343,133 @@ async function exportProducts(req, res, next) {
   }
 }
 
+async function getStatistics(req, res, next) {
+  try {
+    // Get all products
+    const products = await runQuery('SELECT * FROM products');
+    
+    // Get all inventory history
+    const history = await runQuery(
+      'SELECT * FROM inventory_history ORDER BY change_date DESC LIMIT 100'
+    );
+
+    // Calculate total stock
+    const totalStock = products.reduce((sum, p) => sum + (Number(p.stock) || 0), 0);
+
+    // Calculate stock by category
+    const stockByCategory = {};
+    const productsByCategory = {};
+    products.forEach((product) => {
+      const cat = product.category || 'Uncategorized';
+      stockByCategory[cat] = (stockByCategory[cat] || 0) + (Number(product.stock) || 0);
+      productsByCategory[cat] = (productsByCategory[cat] || 0) + 1;
+    });
+
+    // Calculate low stock items (stock <= 10)
+    const lowStockItems = products.filter((p) => (Number(p.stock) || 0) <= 10);
+    const outOfStockItems = products.filter((p) => (Number(p.stock) || 0) === 0);
+
+    // Calculate recent updates (last 7 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const recentUpdates = history.filter(
+      (h) => new Date(h.change_date) >= sevenDaysAgo
+    );
+
+    // Calculate stock changes in last 7 days
+    const stockChanges = recentUpdates.reduce(
+      (acc, h) => {
+        const change = Number(h.new_quantity) - Number(h.old_quantity);
+        return {
+          totalIncrease: acc.totalIncrease + (change > 0 ? change : 0),
+          totalDecrease: acc.totalDecrease + (change < 0 ? Math.abs(change) : 0),
+          count: acc.count + 1,
+        };
+      },
+      { totalIncrease: 0, totalDecrease: 0, count: 0 }
+    );
+
+    // Get top products by stock
+    const topProductsByStock = [...products]
+      .sort((a, b) => (Number(b.stock) || 0) - (Number(a.stock) || 0))
+      .slice(0, 10)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        stock: Number(p.stock) || 0,
+        category: p.category,
+      }));
+
+    // Get most active products (most history entries)
+    const productActivityCount = {};
+    history.forEach((h) => {
+      productActivityCount[h.product_id] = (productActivityCount[h.product_id] || 0) + 1;
+    });
+
+    const mostActiveProducts = Object.entries(productActivityCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .map(([productId, count]) => {
+        const product = products.find((p) => p.id === Number(productId));
+        return product
+          ? {
+              id: product.id,
+              name: product.name,
+              updateCount: count,
+              category: product.category,
+            }
+          : null;
+      })
+      .filter(Boolean);
+
+    // Calculate total products
+    const totalProducts = products.length;
+
+    // Get category breakdown
+    const categoryBreakdown = Object.keys(stockByCategory).map((category) => ({
+      category,
+      totalStock: stockByCategory[category],
+      productCount: productsByCategory[category],
+      percentage: ((stockByCategory[category] / totalStock) * 100).toFixed(1),
+    }));
+
+    return res.json({
+      overview: {
+        totalProducts,
+        totalStock,
+        lowStockCount: lowStockItems.length,
+        outOfStockCount: outOfStockItems.length,
+      },
+      stockByCategory: categoryBreakdown,
+      recentActivity: {
+        updatesLast7Days: recentUpdates.length,
+        stockIncrease: stockChanges.totalIncrease,
+        stockDecrease: stockChanges.totalDecrease,
+        totalChanges: stockChanges.count,
+      },
+      topProducts: {
+        byStock: topProductsByStock,
+        mostActive: mostActiveProducts,
+      },
+      alerts: {
+        lowStock: lowStockItems.map((p) => ({
+          id: p.id,
+          name: p.name,
+          stock: Number(p.stock) || 0,
+          category: p.category,
+        })),
+        outOfStock: outOfStockItems.map((p) => ({
+          id: p.id,
+          name: p.name,
+          category: p.category,
+        })),
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   getProducts,
   getCategories,
@@ -352,5 +479,6 @@ module.exports = {
   getProductHistory,
   importProducts,
   exportProducts,
+  getStatistics,
 };
 

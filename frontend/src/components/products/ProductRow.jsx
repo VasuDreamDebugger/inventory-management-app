@@ -57,6 +57,27 @@ function ProductRow({ product, onEdit, onDelete, onViewHistory }) {
   return (
     <tr>
       <td>
+        <div className="product-image-cell">
+          {product.image ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              className="product-image"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+          ) : null}
+          <div
+            className="product-image-placeholder"
+            style={{ display: product.image ? 'none' : 'flex' }}
+          >
+            <span>No Image</span>
+          </div>
+        </div>
+      </td>
+      <td>
         {isEditing ? (
           <input
             name="name"
@@ -80,7 +101,7 @@ function ProductRow({ product, onEdit, onDelete, onViewHistory }) {
           product.category || '—'
         )}
       </td>
-      <td>
+      <td style={{ textAlign: 'center' }}>
         {isEditing ? (
           <input
             name="brand"
@@ -92,7 +113,7 @@ function ProductRow({ product, onEdit, onDelete, onViewHistory }) {
           product.brand || '—'
         )}
       </td>
-      <td>
+      <td style={{ textAlign: 'center' }}>
         {isEditing ? (
           <input
             name="unit"
@@ -104,7 +125,7 @@ function ProductRow({ product, onEdit, onDelete, onViewHistory }) {
           product.unit || '—'
         )}
       </td>
-      <td>
+      <td style={{ paddingLeft: '30px' }}>
         {isEditing ? (
           <input
             type="number"
@@ -118,7 +139,7 @@ function ProductRow({ product, onEdit, onDelete, onViewHistory }) {
           product.stock
         )}
       </td>
-      <td>
+      <td style={{ textAlign: 'center' }}>
         <span className={`status-badge ${statusClass}`}>
           {formData.stock === 0 ? 'Out of Stock' : 'In Stock'}
         </span>

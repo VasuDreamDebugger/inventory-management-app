@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 import ProductFilters from './ProductFilters';
 import ProductTable from './ProductTable';
 import PaginationControls from './PaginationControls';
@@ -17,9 +18,6 @@ function ProductsPage() {
   const [order, setOrder] = useState('asc');
   const [page, setPage] = useState(1);
   const [categoryOptions, setCategoryOptions] = useState([]);
-
-  const [notification, setNotification] = useState('');
-  const [notificationType, setNotificationType] = useState('success');
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formProduct, setFormProduct] = useState(null);
@@ -105,12 +103,6 @@ function ProductsPage() {
   const combinedCategoryOptions =
     categoryOptions.length > 0 ? categoryOptions : fallbackCategories;
 
-  const showNotification = (message, type = 'success') => {
-    setNotification(message);
-    setNotificationType(type);
-    setTimeout(() => setNotification(''), 4000);
-  };
-
   const handleSortChange = (field) => {
     setSort((prevSort) => {
       if (prevSort === field) {
@@ -129,16 +121,13 @@ function ProductsPage() {
     formData.append('csvFile', file);
     try {
       const result = await productsApi.importProducts(formData);
-      showNotification(
+      toast.success(
         `Import complete. Added ${result.added}, skipped ${result.skipped}.`
       );
       refresh();
       fetchCategories();
     } catch (err) {
-      showNotification(
-        err.response?.data?.error || 'Failed to import CSV',
-        'error'
-      );
+      toast.error(err.response?.data?.error || 'Failed to import CSV');
     }
   };
 
@@ -153,18 +142,16 @@ function ProductsPage() {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
+      toast.success('Products exported successfully');
     } catch (err) {
-      showNotification(
-        err.response?.data?.error || 'Failed to export CSV',
-        'error'
-      );
+      toast.error(err.response?.data?.error || 'Failed to export CSV');
     }
   };
 
   const handleInlineEdit = async (id, values) => {
     try {
       await productsApi.updateProduct(id, values);
-      showNotification('Product updated');
+      toast.success('Product updated successfully');
       refresh();
       fetchCategories();
     } catch (err) {
@@ -172,7 +159,7 @@ function ProductsPage() {
         err.response?.data?.error ||
         err.response?.data?.errors?.[0]?.msg ||
         'Failed to update product';
-      showNotification(message, 'error');
+      toast.error(message);
       throw err;
     }
   };
@@ -182,13 +169,12 @@ function ProductsPage() {
     if (!ok) return;
     try {
       await productsApi.deleteProduct(id);
-      showNotification('Product deleted');
+      toast.success('Product deleted successfully');
       refresh();
       fetchCategories();
     } catch (err) {
-      showNotification(
-        err.response?.data?.error || 'Failed to delete product',
-        'error'
+      toast.error(
+        err.response?.data?.error || 'Failed to delete product'
       );
     }
   };
@@ -197,10 +183,10 @@ function ProductsPage() {
     try {
       if (formProduct) {
         await productsApi.updateProduct(formProduct.id, values);
-        showNotification('Product updated');
+        toast.success('Product updated successfully');
       } else {
         await productsApi.createProduct(values);
-        showNotification('Product created');
+        toast.success('Product created successfully');
       }
       setIsFormOpen(false);
       setFormProduct(null);
@@ -211,7 +197,7 @@ function ProductsPage() {
         err.response?.data?.error ||
         err.response?.data?.errors?.[0]?.msg ||
         'Failed to save product';
-      showNotification(message, 'error');
+      toast.error(message);
       throw err;
     }
   };
@@ -248,11 +234,6 @@ function ProductsPage() {
           onExport={handleExport}
         />
       </div>
-      {notification && (
-        <div className={`inline-alert ${notificationType}`}>
-          {notification}
-        </div>
-      )}
 
       <ProductTable
         products={products}

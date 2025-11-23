@@ -46,6 +46,11 @@ const productsApi = {
     });
     return response.data;
   },
+
+  async getStatistics() {
+    const response = await axiosClient.get('/products/statistics');
+    return response.data;
+  },
 };
 
 export default productsApi;

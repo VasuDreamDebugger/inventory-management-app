@@ -35,6 +35,7 @@ router.post(
   productsController.importProducts
 );
 router.get('/export', authMiddleware, productsController.exportProducts);
+router.get('/statistics', authMiddleware, productsController.getStatistics);
 
 module.exports = router;
 

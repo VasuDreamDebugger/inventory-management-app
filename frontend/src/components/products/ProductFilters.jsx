@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function ProductFilters({
   search,
@@ -11,6 +12,7 @@ function ProductFilters({
   onImport,
   onExport,
 }) {
+  const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
   const handleFileChange = (event) => {
@@ -59,6 +61,9 @@ function ProductFilters({
           hidden
           onChange={handleFileChange}
         />
+         <button type="button" className="stats-btn-filter" onClick={() => navigate('/stats')}>
+          📊 Statistics
+        </button>
         <button
           type="button"
           className="import-btn"
@@ -69,6 +74,7 @@ function ProductFilters({
         <button type="button" className="export-btn" onClick={onExport}>
           Export CSV
         </button>
+       
         <button type="button" className="primary-btn" onClick={onAddClick}>
           Add Product
         </button>
