@@ -1,111 +1,85 @@
-Inventory Management API
-Short description
-Inventory Management API — a small Node.js + Express backend that provides user authentication, product CRUD, inventory history tracking, and CSV import/export for products. It uses SQLite for persistence and JWT for authentication.
+📦 Inventory Management System
 
-Tech stack
-Node.js (CommonJS)
-Express
+A full-stack Inventory Management application with a React (Vite) frontend and Node.js + Express backend. It supports product management, authentication, inventory tracking, and CSV import/export.
+
+🚀 Features
+🔐 User authentication (JWT-based login/register)
+📦 Product CRUD with pagination, search & filters
+✏️ Inline product editing
+📊 Inventory history tracking
+📁 CSV import/export support
+📈 Product statistics
+
+
+Frontend
+Tech Stack
+Vite + React
+React Router
+Axios (custom client)
+Jest + React Testing Library
+Plain CSS
+Key Functionalities
+Product listing with pagination & sorting
+Search and category filtering
+Inline editing
+Inventory history sidebar
+Auth token stored in localStorage
+Structure
+src/
+  components/
+  api/
+  hooks/
+  styles/
+  main.jsx
+Routing
+/login → Authentication
+/ → Products dashboard
+
+⚙️ Backend
+Tech Stack
+Node.js + Express
 SQLite (sqlite3)
-Authentication: JSON Web Tokens (jsonwebtoken)
-Validation: express-validator
-File upload: multer
-CSV parsing: csv-parser
-Testing: Jest (basic unit tests under tests/)
-Key features
-User registration & login (JWT issuance and verification).
-Product CRUD (create, read with pagination & filters, update, delete).
-Inventory history: records stock changes in inventory_history on updates and create.
-CSV import/export for products (CSV upload and download endpoints).
-Pagination, sorting and search on product listing.
-Architecture & folder structure
-The code separates concerns using controllers, routes, middleware and a small model initializer for the DB.
+JWT Authentication
+express-validator
+multer + csv-parser
+Jest
+Key Functionalities
+User authentication (JWT)
+Product CRUD operations
+Inventory history tracking
+CSV import/export
+Filtering, pagination, sorting
+Structure
+src/
+  server.js
+  config/
+  controllers/
+  routes/
+  middleware/
+  models/
+uploads/
+tests/
+🗄️ Database Schema
+Users
+id, name, email, password_hash
+Products
+id, name, unit, category, brand, stock, status, image
+Inventory History
+id, product_id, old_quantity, new_quantity, change_date, user_info
+🔌 API Overview
 
-Important folders/files
-
-src/server.js — application entry, sets up middleware, routes and DB initialization.
-src/config/
-env.js — loads .env and exposes port, jwtSecret, dbFile.
-db.js — opens SQLite connection (exports a sqlite3 Database instance).
-src/controllers/ — request handlers for auth and products (authController.js, productsController.js).
-src/routes/ — Express routers:
-authRoutes.js → /api/auth (register, login)
-productsRoutes.js → /api/products (listing, create, update, delete, import/export, history)
-src/middleware/ — reusable middleware: authMiddleware.js (JWT auth), validation.js (express-validator helpers), upload.js (multer config), errorHandler.js.
-src/models/initDb.js — creates tables if missing on startup (users, products, inventory_history).
-uploads/ — directory used by multer for incoming files (CSV imports, images).
-tests/ — beginner-level Jest tests (unit tests for controllers and middleware).
-Database schema (overview)
-users
-
-id (INTEGER PRIMARY KEY) — user id
-name (TEXT) — display name
-email (TEXT UNIQUE) — login email
-password_hash (TEXT) — bcrypt hash of the password
-products
-
-id (INTEGER PRIMARY KEY)
-name (TEXT UNIQUE) — product name
-unit (TEXT)
-category (TEXT)
-brand (TEXT)
-stock (INTEGER) — current stock quantity
-status (TEXT) — optional status
-image (TEXT) — image URL/path
-inventory_history
-
-id (INTEGER PRIMARY KEY)
-product_id (INTEGER) — FK to products.id
-old_quantity (INTEGER)
-new_quantity (INTEGER)
-change_date (TEXT, ISO string)
-user_info (TEXT) — who performed the change (email or system)
-API overview
-Base URL: http://localhost:<PORT>/api (default PORT is 5000)
+Base URL: http://localhost:5000/api
 
 Auth
-
-POST /api/auth/register — Register a new user. Validates name, email, password. Returns { user, token } on success.
-POST /api/auth/login — Log in with email and password. Returns { user, token }.
+POST /auth/register
+POST /auth/login
 Products
-
-GET /api/products — List products. Supports query params: search, category, page, limit, sort, order.
-GET /api/products/categories — Returns list of distinct categories.
-POST /api/products — Create product (auth required). Validates name and stock. Records initial inventory history (old 0 → new stock).
-PUT /api/products/:id — Update product (auth required). If stock changes, inserts a row in inventory_history.
-DELETE /api/products/:id — Delete a product (auth required).
-GET /api/products/:id/history — Get inventory history for a product (auth required).
-POST /api/products/import — Import products from CSV (auth required). Expects form field csvFile (multer middleware).
-GET /api/products/export — Export products as CSV (auth required).
-GET /api/products/statistics — Returns aggregated statistics (auth required).
-Environment variables
-The backend reads environment variables from .env via dotenv (file: src/config/env.js).
-
-Example .env (place inside backend/):
-
-PORT=5000
-JWT_SECRET=your_jwt_secret_here
-DB_FILE=./inventory.db
-Notes:
-
-DB_FILE defaults to ./inventory.db and the DB file is created/initialized by initDb when the server starts.
-Setup & installation
-Open a terminal and change into the backend folder:
-cd backend
-Install dependencies:
-npm install
-Create a .env file (see example above).
-Start the app:
-Development (with nodemon if present): npm run dev
-Production: npm start
-The server listens on PORT (default 5000). API root: http://localhost:5000/api.
-
-Testing
-Beginner-level Jest tests (controller and middleware tests) are located under backend/tests/.
-Run tests:
-cd backend
-npm test
-Future improvements (suggestions)
-Move from SQLite to a client-server DB (Postgres) for multi-user production scenarios.
-Add role-based access control (admin vs regular users).
-Improve validation and add more unit/integration tests (Supertest for endpoint-level tests).
-Add pagination cursors and more secure token rotation/refresh tokens.
+GET /products (search, filter, pagination)
+POST /products
+PUT /products/:id
+DELETE /products/:id
+GET /products/:id/history
+GET /products/categories
+POST /products/import
+GET /products/export
+GET /products/statistics
